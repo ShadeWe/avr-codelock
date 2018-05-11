@@ -3,3 +3,4 @@ codelock/Debug/*
 !codelock.elf
 
 *.workspace
+*.pdsbak

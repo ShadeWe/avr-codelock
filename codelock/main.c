@@ -13,70 +13,138 @@
 #include <avr/delay.h>
 #include <avr/interrupt.h>
 
-char portState[3]= {0xEF,0xDF,0xBF};
-char inputState[4] = {0x01,0x02,0x04,0x08};
-char i, j = 0;
+// the correct password, the only one at the moment
+char password[10] = "1234";
 
-char mass2[4][3]={{'1','2','3'},
-				  {'4','5','6'},
-				  {'7','8','9'},
-				  {'C','0','E'}};
+char pendingChar = 0;		// the number of the entered figure
 
-ISR(TIMER1_COMPA_vect) {
-		
-	for(i=0; i<3; i++)
+char passwordEntered[10];
+
+char portState[3]= {0xEF,0xDF,0xBF};			// the states of the scanning pins
+char inputState[4] = {0x01,0x02,0x04,0x08};		// the states of the reading pins
+	
+// asterisks are drawn at these positions in the same order as here and it makes them to be closer to the center
+char positions[10] = {0x47, 0x48, 0x46, 0x49, 0x45, 0x4A, 0x44, 0x4B, 0x43, 0x4C};
+
+char buttonsValues[4][3]= { {'1','2','3'}, {'4','5','6'}, {'7','8','9'}, {'C','0','E'} };
+
+ISR(TIMER0_COMPA_vect) {
+	
+	for(char i = 0; i < 3; i++)
 	{
 		PORTB=portState[i];
-		for(j=0; j<4; j++)
+		for(char j = 0; j < 4; j++)
 		{
 			if(((PINB&inputState[j])==0))
 			{
-				while((PINB&inputState[j])!=inputState[j]){};
-				lcd_putc(mass2[j][i]);
+				// waits until a button is unpressed
+				while((PINB&inputState[j])!=inputState[j]);
+				
+				onClick(buttonsValues[j][i]);
 			}
 		}
 	}
 		
 }
 
+void asterisksDrawing(char num) {
+	lcd_goto(positions[num]);
+	lcd_putc('*');
+}
+
+void accessDeniedScreen() {
+	lcd_clrscr();
+	lcd_home();
+	lcd_puts(" ACCESS  DENIED");
+	_delay_ms(1000);
+	
+	clearEnteredPassword();
+}
+
+void accessAllowedScreen() {
+	lcd_clrscr();
+	lcd_home();
+	lcd_puts(" ACCESS ALLOWED");
+	_delay_ms(1000);
+	lcd_clrscr();
+	lcd_home();
+}
+
+void enterPasswordScreen() {
+	lcd_clrscr();
+	lcd_home();
+	lcd_puts(" ENTER PASSWORD ");
+}
+
+void clearEnteredPassword() {
+	memset(passwordEntered, 0, 10);
+	pendingChar = 0;
+	enterPasswordScreen();
+}
+
+void onClick(char buttonPressed) {
+	switch (buttonPressed) {
+		
+		// confirm
+		case 'E':
+			
+			// if the password is correct
+			if (strcmp(passwordEntered, password) == 0)
+				accessAllowedScreen();
+			else
+				accessDeniedScreen();
+
+		break;
+		
+		// clear
+		case 'C':	
+			clearEnteredPassword();
+		break;
+		
+		// handle numbers
+		default:
+			
+			// passwords are less or 10 characters long
+			if (pendingChar >= 10) 
+				break;
+			
+			passwordEntered[pendingChar] = buttonPressed;
+			asterisksDrawing(pendingChar);
+			pendingChar++;
+			
+		break;
+	}
+}
+
 void timerInit() {
 	
-	// Timer 1
-	TCCR1B = (1<<WGM12);    // The CTC mode. The compare interrupt occurs when the compare value is reached
-	TCCR1B |= (1<<CS10);	// Using FCPU
-	
-	/* prescalers */
-	
-	TCCR1B |= (1<<CS10)|(1<<CS11);			// CLK/64
-	
-	// TCCR1B |= (1<<CS11);					// CLK/8
-	// TCCR1B |= (1<<CS12);					// CLK/256
-	// TCCR1B |= (1<<CS10)|(1<<CS12);		// CLK/1024
+	TCCR1A = (1<<WGM01);				// The CTC mode. The compare interrupt occurs when the compare value is reached
+	TCCR1B |= (1<<CS00);				// Using FCPU
+	TCCR0B = (1<<CS00) | (1 << CS02);	// prescaler
+	OCR0A = 200;						// the compare value
 
-	OCR1A = 1000;          // The compare value
-	
 	// Interrupt frequency = Fclk/(N*(1+OCR1A))
 	// N - the value of the prescaler
 	
-	TIMSK1 = (1<<OCIE1A);  // enable the compare interrupt
+	TIMSK0 = (1 << OCIE0A);
 	
 	sei();
 }
+
+
 
 int main(void)
 {
 	timerInit();
 	
-	lcd_init();
-	lcd_clrscr();
-	
+	// scanning and reading pins
 	PORTB = 0b01111111;
 	DDRB = 0b01110000;
 	
+	lcd_init();
 	
-    while (1)
-    {
-		
-    }
+	enterPasswordScreen();
+	
+	while (1);
 }
 
