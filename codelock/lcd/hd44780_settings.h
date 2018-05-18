@@ -23,14 +23,14 @@
 #define LCD_DB4_PORT             PORTD       // If using 4 bit omde, yo umust configure DB4-DB7
 #define LCD_DB4_PIN              4
 #define LCD_DB5_PORT             PORTD
-#define LCD_DB5_PIN              5
+#define LCD_DB5_PIN              2
 #define LCD_DB6_PORT             PORTD
-#define LCD_DB6_PIN              6
+#define LCD_DB6_PIN              1
 #define LCD_DB7_PORT             PORTD
-#define LCD_DB7_PIN              7
+#define LCD_DB7_PIN              0
 
 #define LCD_RS_PORT              PORTD       // Port for RS line
-#define LCD_RS_PIN               0           // Pin for RS line
+#define LCD_RS_PIN               6           // Pin for RS line
 
 #define LCD_RW_PORT              PORTC       // Port for RW line (ONLY used if RW_LINE_IMPLEMENTED=1)
 #define LCD_RW_PIN               6           // Pin for RW line (ONLY used if RW_LINE_IMPLEMENTED=1)
@@ -42,7 +42,7 @@
                                              // Display 1 Settings - if you only have 1 display, YOU MUST SET THESE
 #define LCD_DISPLAY_LINES        2           // Number of Lines, Only Used for Set I/O Mode Command
 #define LCD_E_PORT               PORTD       // Port for E line
-#define LCD_E_PIN                1           // Pin for E line
+#define LCD_E_PIN                5           // Pin for E line
 
 #if (LCD_DISPLAYS>=2)                        // If you have 2 displays, set these and change LCD_DISPLAYS=2
   #define LCD_DISPLAY2_LINES     2           // Number of Lines, Only Used for Set I/O Mode Command
