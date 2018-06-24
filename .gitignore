@@ -1,6 +1,5 @@
 codelock/Debug/*
 !codelock.hex
 !codelock.elf
-
-*.workspace
-*.pdsbak
+!ñode.bin
+!codelock.eep
