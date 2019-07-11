@@ -5,4 +5,5 @@ The device can also be configured for using different electromagnetic locks whic
 The microcontroller used in this device is _ATmega328P_, but _ATmega8_ can also be used. Since the device's power supply is 12V (electromagnetic locks usually take 12V), there's a 5V voltage regulator for supplying the logic part.
 
 _The circuit diagram of this code lock:_
-<img src="https://lh6.googleusercontent.com/q_g6ilXKKerlRdi1DlZqE8ke4TGtYyuDD5x3gi6AFBSH6ftueQnygeeHY1AeY0dMpkISRz6OfBA1MAttWBEo=w1366-h635">
+
+![Alt text](codelock.BMP)
